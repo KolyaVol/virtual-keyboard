@@ -10,7 +10,7 @@ container.appendChild(title);
 const textarea = document.createElement("textarea");
 textarea.classList.add("textarea");
 container.appendChild(textarea);
-let cursorPos = textarea.selectionStart;
+let selectionStart = textarea.selectionStart;
 
 const keyboard = document.createElement("section");
 keyboard.classList.add("keyboard");
@@ -95,8 +95,8 @@ const keyLayoutEng = [
   ",",
   ".",
   "/",
-  "br",
-  "up arrow",
+  "void",
+  "↑",
   "shift",
   "ctrl",
   "Win",
@@ -104,9 +104,9 @@ const keyLayoutEng = [
   "space",
   "alt",
   "ctrl",
-  "left arrow",
-  "down arrow",
-  "right arrow",
+  "←",
+  "↓",
+  "→",
 ];
 const keyLayoutEngShift = [
   "~",
@@ -152,7 +152,6 @@ const keyLayoutEngShift = [
   "/",
   "enter",
   "shift",
-  "\\",
   "Z",
   "X",
   "C",
@@ -163,7 +162,8 @@ const keyLayoutEngShift = [
   "<",
   ">",
   "?",
-  "up arrow",
+  "void",
+  "↑",
   "shift",
   "ctrl",
   "Win",
@@ -171,9 +171,9 @@ const keyLayoutEngShift = [
   "space",
   "alt",
   "ctrl",
-  "left arrow",
-  "down arrow",
-  "right arrow",
+  "←",
+  "↓",
+  "→",
 ];
 const keyLayoutRu = [
   "ё",
@@ -229,8 +229,8 @@ const keyLayoutRu = [
   "б",
   "ю",
   ".",
-  "br",
-  "up arrow",
+  "void",
+  "↑",
   "shift",
   "ctrl",
   "Win",
@@ -238,9 +238,9 @@ const keyLayoutRu = [
   "space",
   "alt",
   "ctrl",
-  "left arrow",
-  "down arrow",
-  "right arrow",
+  "←",
+  "↓",
+  "→",
 ];
 const keyLayoutRuShift = [
   "Ё",
@@ -286,7 +286,6 @@ const keyLayoutRuShift = [
   `/`,
   "enter",
   "shift",
-  "\\",
   "Я",
   "Ч",
   "С",
@@ -297,7 +296,8 @@ const keyLayoutRuShift = [
   "Б",
   "Ю",
   ",",
-  "up arrow",
+  "void",
+  "↑",
   "shift",
   "ctrl",
   "Win",
@@ -305,9 +305,9 @@ const keyLayoutRuShift = [
   "space",
   "alt",
   "ctrl",
-  "left arrow",
-  "down arrow",
-  "right arrow",
+  "←",
+  "↓",
+  "→",
 ];
 
 let currKeyLayout = keyLayoutEng;
@@ -319,27 +319,31 @@ let isRus = false,
 if (isAlt && isShift) {
   isRus = !isRus;
 }
-const changeShift = () => {
-  isShift = !isShift;
-};
-const changeAlt = () => {
-  isAlt = !isAlt;
-};
-const changeCaps = () => {
-  isCaps = !isCaps;
-};
+
 if (isShift && isAlt) {
   isRus = !isRus;
 }
 if (isRus) {
   currKeyLayout = keyLayoutRu;
-  console.log(isRus);
   reloadKeys();
 } else currKeyLayout = keyLayoutEng;
 
+function removeActiveClass(item) {
+  setTimeout(() => {
+    item.classList.remove("active");
+  }, 500);
+}
+
+function addText(text) {
+  selectionStart = textarea.selectionStart;
+  let startText = textarea.value.substring(0, selectionStart);
+  let endText = textarea.value.substring(selectionStart, textarea.value.length);
+  textarea.value = startText + text + endText;
+}
+
 const createKeys = () => {
   currKeyLayout.forEach((key) => {
-    if (key === "br") {
+    if (key === "void") {
       document
         .querySelector(".keyboard__forth-line")
         .appendChild(document.createElement("div"));
@@ -349,79 +353,7 @@ const createKeys = () => {
       keyElement.setAttribute("type", "button");
       keyElement.classList.add("keyboard__key");
 
-      switch (key) {
-        case "backspace":
-          keyElement.textContent = key;
-          keyElement.addEventListener("click", () => {
-            let text = textarea.value;
-
-            if (cursorPos === textarea.value.length || cursorPos === 0) {
-              textarea.value = text.slice(0, textarea.value.length - 1);
-            } else {
-              textarea.value =
-                text.slice(0, cursorPos - 1) +
-                text.slice(cursorPos, textarea.length);
-            }
-            textarea.selectionStart = cursorPos;
-            textarea.selectionEnd = cursorPos;
-            textarea.focus();
-          });
-
-          break;
-
-        case "del":
-          keyElement.textContent = key;
-          keyElement.addEventListener("click", () => {
-            let text = textarea.value;
-            let cursorPosition = textarea.selectionStart;
-            textarea.value =
-              text.slice(0, cursorPosition) +
-              text.slice(cursorPosition + 1, textarea.length);
-          });
-
-          break;
-
-        case "caps":
-          keyElement.addEventListener("click", changeCaps());
-
-          break;
-
-        case "shift":
-          keyElement.textContent = key;
-          keyElement.addEventListener("mousedown", () => {
-            changeShift();
-            keyElement.addEventListener("mouseup", changeShift());
-            keyElement.removeEventListener("mouseup", changeShift());
-          });
-
-          break;
-
-        case "alt":
-          keyElement.textContent = key;
-          keyElement.addEventListener("mousedown", () => {
-            changeAlt();
-            keyElement.addEventListener("mouseup", changeAlt());
-            keyElement.removeEventListener("mouseup", changeAlt());
-          });
-          break;
-
-        case "enter":
-          keyElement.textContent = key;
-          keyElement.addEventListener("click", () => {});
-
-          break;
-
-        case "space":
-          keyElement.addEventListener("click", () => {});
-
-          break;
-
-        default:
-          keyElement.textContent = key;
-          keyElement.addEventListener("click", () => {});
-
-          break;
-      }
+      keyElement.textContent = key;
 
       if (currKeyLayout.indexOf(key) < 14) {
         document.querySelector(".keyboard__first-line").appendChild(keyElement);
@@ -441,60 +373,231 @@ const createKeys = () => {
 };
 
 createKeys();
-
-function reloadKeys() {
-  [...document.querySelectorAll(".keyboard__line")].forEach((line) => {
-    line.innerHTML = "";
-  });
-  createKeys();
-}
-
-keyboard.addEventListener("click", (e) => {
-  [...keyboard.getElementsByClassName("keyboard__key")].forEach((key) => {
-    key.classList.remove("active");
-  });
-
-  e.target.classList.add("active");
-  setTimeout(() => {
-    e.target.classList.remove("active");
-  }, 500);
-
-  if (e.target.innerText.length > 1) {
-    return;
-  } else textarea.value += e.target.innerText;
-});
-
 let btns = [...keyboard.getElementsByClassName("keyboard__key")];
 
+function reloadKeys() {
+  let counter = 0;
+  btns.forEach((item) => {
+    if (counter > 52) {
+      counter++;
+      item.textContent = currKeyLayout[counter];
+    } else {
+      counter++;
+      item.textContent = currKeyLayout[counter - 1];
+    }
+  });
+}
+
+keyboard.addEventListener("mousedown", (e) => {
+  let text = textarea.value;
+  e.target.classList.add("active");
+ 
+
+  switch (e.target.innerText.toLowerCase()) {
+    case "ctrl":
+      btns.forEach((item) => {
+        if (item.textContent === "ctrl") {
+          item.classList.add("active");
+        }
+      });
+      break;
+
+    case "tab":
+      textarea.value += "    ";
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "tab") {
+          item.classList.add("active");
+        }
+      });
+      break;
+
+    case "space":
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "space") {
+          textarea.value += " ";
+          item.classList.add("active");
+        }
+      });
+      break;
+
+    case "enter":
+      e.preventDefault();
+      textarea.value += "\n";
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "enter") {
+          item.classList.add("active");
+        }
+      });
+      break;
+
+    case "backspace":
+      text = textarea.value;
+      selectionStart = textarea.selectionStart;
+      if (selectionStart === textarea.value.length || selectionStart === 0) {
+        textarea.value = text.slice(0, textarea.value.length - 1);
+      } else {
+        textarea.value =
+          text.slice(0, selectionStart - 1) +
+          text.slice(selectionStart, textarea.value.length);
+      }
+      textarea.selectionStart = selectionStart - 1;
+      textarea.selectionEnd = selectionStart - 1;
+      textarea.focus();
+      break;
+
+    case "del":
+      text = textarea.value;
+      selectionStart = textarea.selectionStart;
+      if (selectionStart === textarea.value.length || selectionStart === 0) {
+        textarea.value = text.slice(0, textarea.value.length - 1);
+      } else {
+        textarea.value =
+          text.slice(0, selectionStart) +
+          text.slice(selectionStart, textarea.value.length);
+      }
+      break;
+
+    case "shift":
+      isShift = true;
+      if (isRus) {
+        currKeyLayout = keyLayoutRu;
+        localStorage.setItem("ru", "ru");
+        reloadKeys();
+      } else {
+        currKeyLayout = keyLayoutEng;
+        localStorage.removeItem("ru");
+        reloadKeys();
+      }
+      if (isShift && isRus) {
+        currKeyLayout = keyLayoutRuShift;
+        reloadKeys();
+      } else if (isShift && !isRus) {
+        currKeyLayout = keyLayoutEngShift;
+        reloadKeys();
+      }
+      if (isShift && isAlt) {
+        isRus = !isRus;
+      }
+      break;
+
+    case "caps lock":
+      isCaps = !isCaps;
+
+      btns.forEach((item) => {
+        if (item.textContent.toUpperCase() === "caps lock") {
+          item.classList.add("active");
+        }
+      });
+      btns.forEach((item) => {
+        if (isCaps && item.innerText.length < 2) {
+          item.innerText = item.innerText.toUpperCase();
+        } else {
+          item.innerText = item.innerText.toLowerCase();
+        }
+      });
+      break;
+
+    case "alt":
+      isAlt = true;
+      break;
+
+    default:
+      break;
+  }
+
+  keyboard.addEventListener("mouseup", (e) => {
+    removeActiveClass(e.target);
+  });
+  if (e.target.innerText.length > 1) {
+    return;
+  } else {
+    addText(e.target.innerText);
+  }
+});
+
 document.addEventListener("keydown", (e) => {
-  const btn = [...btns].find((btn) => btn.textContent === e.key);
+  e.preventDefault();
+  let text = textarea.value;
+ 
+  const btn = btns.find(
+    (btn) => btn.textContent.toLowerCase() === e.key.toLowerCase()
+  );
   btn ? btn.classList.add("active") : "";
 
   switch (e.key) {
     case "Control":
+      btns.forEach((item) => {
+        if (item.textContent === "ctrl") {
+          item.classList.add("active");
+        }
+      });
+
+      break;
+    case "Tab":
+      textarea.value += "    ";
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "tab") {
+          item.classList.add("active");
+        }
+      });
+      break;
+    case " ":
+      textarea.value += " ";
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "space") {
+          item.classList.add("active");
+          removeActiveClass(item);
+        }
+      });
+      break;
+    case "Enter":
+      e.preventDefault();
+      textarea.value += "\n";
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "enter") {
+          item.classList.add("active");
+        }
+      });
+
       break;
     case "Backspace":
-      let text = textarea.value;
-
-      if (cursorPos === textarea.value.length || cursorPos === 0) {
+      text = textarea.value;
+      selectionStart = textarea.selectionStart;
+      if (selectionStart === textarea.value.length || selectionStart === 0) {
         textarea.value = text.slice(0, textarea.value.length - 1);
       } else {
         textarea.value =
-          text.slice(0, cursorPos - 1) + text.slice(cursorPos, textarea.length);
+          text.slice(0, selectionStart - 1) +
+          text.slice(selectionStart, textarea.value.length);
       }
-      textarea.selectionStart = cursorPos;
-      textarea.selectionEnd = cursorPos;
+      textarea.selectionStart = selectionStart - 1;
+      textarea.selectionEnd = selectionStart - 1;
       textarea.focus();
+
       break;
-    case "Del":
-      let cursorPosition = textarea.selectionStart;
-      textarea.value =
-        text.slice(0, cursorPosition) +
-        text.slice(cursorPosition + 1, textarea.length);
+    case "Delete":
+      text = textarea.value;
+      selectionStart = textarea.selectionStart;
+      if (selectionStart === textarea.value.length || selectionStart === 0) {
+        textarea.value = text.slice(0, textarea.value.length - 1);
+      } else {
+        textarea.value =
+          text.slice(0, selectionStart) +
+          text.slice(selectionStart, textarea.value.length);
+      }
       break;
     case "Shift":
       isShift = true;
+      if (isRus) {
+        currKeyLayout = keyLayoutRu;
+        localStorage.removeItem("ru");
+        reloadKeys();
+      } else {
+        currKeyLayout = keyLayoutEng;
+        localStorage.setItem("ru", "ru");
 
+        reloadKeys();
+      }
       if (isShift && isRus) {
         currKeyLayout = keyLayoutRuShift;
         reloadKeys();
@@ -507,6 +610,90 @@ document.addEventListener("keydown", (e) => {
         isRus = !isRus;
       }
 
+      break;
+    case "CapsLock":
+      isCaps = !isCaps;
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "caps lock") {
+          item.classList.add("active");
+        }
+      });
+      btns.forEach((item) => {
+        if (isCaps) {
+          item.innerText = item.innerText.toUpperCase();
+        } else {
+          item.innerText = item.innerText.toLowerCase();
+        }
+      });
+      break;
+
+    case "Alt":
+      isAlt = true;
+      break;
+    case "ArrowLeft":
+      textarea.value += "←";
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "←") {
+          item.classList.add("active");
+          removeActiveClass(item);
+        }
+      });
+      break;
+    case "ArrowRight":
+      textarea.value += "→";
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "→") {
+          item.classList.add("active");
+          removeActiveClass(item);
+        }
+      });
+      break;
+    case "ArrowUp":
+      textarea.value += "↑";
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "↑") {
+          item.classList.add("active");
+          removeActiveClass(item);
+        }
+      });
+      break;
+    case "ArrowDown":
+      textarea.value += "↓";
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "↓") {
+          item.classList.add("active");
+          removeActiveClass(item);
+        }
+      });
+      break;
+    default:
+      addText(e.key);
+      break;
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  
+  const btn = btns.find(
+    (btn) => btn.textContent.toLowerCase() === e.key.toLowerCase()
+  );
+  switch (e.key) {
+    case "Control":
+      btns.forEach((item) => {
+        if (item.textContent === "ctrl") {
+          removeActiveClass(item);
+        }
+      });
+
+      break;
+    case "Shift":
+      isShift = false;
+      btns.forEach((item) => {
+        if (item.textContent === "shift") {
+          removeActiveClass(item);
+        }
+      });
+
       if (isRus) {
         currKeyLayout = keyLayoutRu;
         reloadKeys();
@@ -514,60 +701,47 @@ document.addEventListener("keydown", (e) => {
         currKeyLayout = keyLayoutEng;
         reloadKeys();
       }
+      if (isShift && isRus) {
+        currKeyLayout = keyLayoutRuShift;
+        reloadKeys();
+      } else if (isShift && !isRus) {
+        currKeyLayout = keyLayoutEngShift;
+        reloadKeys();
+      }
 
-      break;
-    case "CapsLock":
-      break;
-    case "Alt":
-      isAlt = true;
       if (isShift && isAlt) {
         isRus = !isRus;
       }
-      if (isRus) {
-        currKeyLayout = keyLayoutRu;
-        reloadKeys();
-      } else currKeyLayout = keyLayoutEng;
+
+      break;
+    case "CapsLock":
+      btns.forEach((item) => {
+        if (item.textContent.toLowerCase() === "caps lock") {
+          removeActiveClass(item);
+        }
+      });
+      break;
+    case "Tab":
+      btns.forEach((item) => {
+        if (item.textContent === "Tab") {
+          removeActiveClass(item);
+        }
+      });
+      break;
+    case "Alt":
+      isAlt = false;
       break;
 
     default:
-      textarea.value += e.key;
       break;
   }
+  removeActiveClass(btn);
 });
 
-document.addEventListener("keyup", (e) => {
-  const btn = [...btns].find(
-    (btn) => btn.textContent.toLowerCase() === e.key.toLowerCase()
-  );
-  if (btn) {
-    switch (e.key) {
-      case "Control":
-        break;
-      case "Shift":
-        isShift = false;
-        if (isShift && isRus) {
-          currKeyLayout = keyLayoutRuShift;
-          reloadKeys();
-        }
-        if (isShift && !isRus) {
-          currKeyLayout = keyLayoutEngShift;
-          reloadKeys();
-        }
-        break;
-      case "CapsLock":
-        break;
-      case "Alt":
-        isAlt = false;
-        break;
-
-      default:
-        break;
-    }
-    setTimeout(() => {
-      btn.classList.remove("active");
-    }, 500);
+document.addEventListener("DOMContentLoaded", () => {
+  if (localStorage.getItem("ru")) {
+    isRus = true;
+    currKeyLayout = keyLayoutRu;
   }
-});
-document.addEventListener("keydown", (e) => {
-  console.log(e);
+  reloadKeys();
 });
