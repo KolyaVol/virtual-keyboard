@@ -3,3 +3,17 @@
     margin: 0;
     box-sizing: border-box;
 }
+
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.textarea {
+    align-self: center;
+    resize: vertical;
+    width: 50%;
+}
