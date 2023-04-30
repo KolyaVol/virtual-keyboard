@@ -10,7 +10,7 @@ container.appendChild(title);
 const textarea = document.createElement("textarea");
 textarea.classList.add("textarea");
 container.appendChild(textarea);
-textarea.addEventListener("click", (e) => {});
+let cursorPos = textarea.selectionStart;
 
 const keyboard = document.createElement("section");
 keyboard.classList.add("keyboard");
@@ -21,7 +21,9 @@ keyboard.addEventListener("click", (e) => {
     key.classList.remove("active");
   });
   e.target.classList.add("active");
-  textarea.value += e.target.innerText;
+  if (e.target.innerText.length > 1) {
+    return;
+  } else textarea.value += e.target.innerText;
 });
 
 const bg = document.createElement("div");
@@ -98,6 +100,7 @@ const createKeys = () => {
     ",",
     ".",
     "/",
+    "br",
     "up arrow",
     "shift",
     "ctrl",
@@ -154,6 +157,7 @@ const createKeys = () => {
     "/",
     "enter",
     "shift",
+    "\\",
     "Z",
     "X",
     "C",
@@ -220,6 +224,7 @@ const createKeys = () => {
     `\\`,
     "enter",
     "shift",
+    "\\",
     "я",
     "ч",
     "с",
@@ -286,6 +291,7 @@ const createKeys = () => {
     `/`,
     "enter",
     "shift",
+    "\\",
     "Я",
     "Ч",
     "С",
@@ -310,54 +316,83 @@ const createKeys = () => {
   ];
   let currKeyLayout = keyLayoutEng;
   currKeyLayout.forEach((key) => {
-    const keyElement = document.createElement("button");
-    const insertLineBreak =
-      ["backspace", "p", "enter", "?"].indexOf(key) !== -1;
-
-    // Add attributes/classes
-    keyElement.setAttribute("type", "button");
-    keyElement.classList.add("keyboard__key");
-
-    switch (key) {
-      case "backspace":
-        keyElement.textContent = key;
-        keyElement.addEventListener("click", () => {});
-
-        break;
-
-      case "caps":
-        keyElement.addEventListener("click", () => {});
-
-        break;
-
-      case "enter":
-        keyElement.textContent = key;
-        keyElement.addEventListener("click", () => {});
-
-        break;
-
-      case "space":
-        keyElement.addEventListener("click", () => {});
-
-        break;
-
-      default:
-        keyElement.textContent = key;
-        keyElement.addEventListener("click", () => {});
-
-        break;
-    }
-
-    if (currKeyLayout.indexOf(key) < 14) {
-      document.querySelector(".keyboard__first-line").appendChild(keyElement);
-    } else if (currKeyLayout.indexOf(key) < 28) {
-      document.querySelector(".keyboard__second-line").appendChild(keyElement);
-    } else if (currKeyLayout.indexOf(key) < 42) {
-      document.querySelector(".keyboard__third-line").appendChild(keyElement);
-    } else if (currKeyLayout.indexOf(key) < 55) {
-      document.querySelector(".keyboard__forth-line").appendChild(keyElement);
+    if (key === "br") {
+      document
+        .querySelector(".keyboard__forth-line")
+        .appendChild(document.createElement("div"));
     } else {
-      document.querySelector(".keyboard__fifth-line").appendChild(keyElement);
+      const keyElement = document.createElement("button");
+
+      keyElement.setAttribute("type", "button");
+      keyElement.classList.add("keyboard__key");
+
+      switch (key) {
+        case "backspace":
+          keyElement.textContent = key;
+          keyElement.addEventListener("click", () => {
+            let text = textarea.value;
+
+            if (cursorPos === textarea.value.length || cursorPos === 0) {
+              textarea.value = text.slice(0, textarea.value.length - 1);
+            } else {
+              textarea.value =
+                text.slice(0, cursorPos - 1) +
+                text.slice(cursorPos, textarea.length);
+            }
+            textarea.selectionStart = cursorPos;
+            textarea.selectionEnd = cursorPos;
+            textarea.focus();
+          });
+
+          break;
+        case "del":
+          keyElement.textContent = key;
+          keyElement.addEventListener("click", () => {
+            let text = textarea.value;
+            let cursorPosition = textarea.selectionStart;
+            textarea.value =
+              text.slice(0, cursorPosition) +
+              text.slice(cursorPosition + 1, textarea.length);
+          });
+
+          break;
+
+        case "caps":
+          keyElement.addEventListener("click", () => {});
+
+          break;
+
+        case "enter":
+          keyElement.textContent = key;
+          keyElement.addEventListener("click", () => {});
+
+          break;
+
+        case "space":
+          keyElement.addEventListener("click", () => {});
+
+          break;
+
+        default:
+          keyElement.textContent = key;
+          keyElement.addEventListener("click", () => {});
+
+          break;
+      }
+
+      if (currKeyLayout.indexOf(key) < 14) {
+        document.querySelector(".keyboard__first-line").appendChild(keyElement);
+      } else if (currKeyLayout.indexOf(key) < 28) {
+        document
+          .querySelector(".keyboard__second-line")
+          .appendChild(keyElement);
+      } else if (currKeyLayout.indexOf(key) < 42) {
+        document.querySelector(".keyboard__third-line").appendChild(keyElement);
+      } else if (currKeyLayout.indexOf(key) < 55) {
+        document.querySelector(".keyboard__forth-line").appendChild(keyElement);
+      } else {
+        document.querySelector(".keyboard__fifth-line").appendChild(keyElement);
+      }
     }
   });
 };

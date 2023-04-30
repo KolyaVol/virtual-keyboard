@@ -80,10 +80,15 @@
   width: 100%;
   height: 3rem;
   border-radius: 0.2rem;
+  border: none;
+  box-shadow: inset 0 0 5px 5px rgba(110, 108, 108, 0.5);
+   transition: 0.5s;
 }
 
 .keyboard__key.active {
-  background-color: yellow;
+  background-color: rgba(221, 211, 211, 0.397);
+  box-shadow: inset 0 0 0px 0px rgba(110, 108, 108, 0.5);
+  transition: 0.5s;
 }
 
 @keyframes rgb-color {
