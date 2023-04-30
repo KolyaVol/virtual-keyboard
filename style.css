@@ -1,19 +1,105 @@
 * {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .textarea {
-    align-self: center;
-    resize: vertical;
-    width: 50%;
+  align-self: center;
+  resize: vertical;
+  width: 50%;
+}
+
+.keyboard {
+  position: relative;
+  padding: 2rem;
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+  width: 80vw;
+  height: 50vh;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border-radius: 2rem;
+  overflow: hidden;
+}
+
+.keyboard__bg {
+  top: -100px;
+  left: -60%;
+  position: absolute;
+  z-index: 1;
+  width: 200vw;
+  height: 200vh;
+  background: rgb(131, 58, 180);
+  background: linear-gradient(
+    90deg,
+    rgba(131, 58, 180, 1) 0%,
+    rgba(94, 98, 191, 1) 20%,
+    rgba(78, 192, 195, 1) 40%,
+    rgba(147, 226, 55, 1) 60%,
+    rgba(243, 131, 32, 1) 80%,
+    rgba(255, 29, 29, 1) 100%
+  );
+  animation: rgb-color infinite linear 10s;
+}
+
+.keyboard__line {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.keyboard__first-line {
+  grid-template-columns: repeat(13, minmax(3rem, 1fr)) 2fr;
+}
+.keyboard__second-line {
+  grid-template-columns: 1.25fr repeat(13, minmax(3rem, 1fr));
+}
+.keyboard__third-line {
+  grid-template-columns: 2fr repeat(12, minmax(3rem, 1fr)) 2fr;
+}
+.keyboard__forth-line {
+  grid-template-columns: 2fr repeat(13, minmax(3rem, 1fr));
+}
+.keyboard__fifth-line {
+  grid-template-columns: repeat(3, minmax(3rem, 1fr)) 6.5fr 1fr 1.5fr repeat(
+      3,
+      minmax(3rem, 1fr)
+    );
+}
+
+.keyboard__key {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 3rem;
+  border-radius: 0.2rem;
+}
+
+.keyboard__key.active {
+  background-color: yellow;
+}
+
+@keyframes rgb-color {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(20%);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  75% {
+    transform: translateX(-20%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }

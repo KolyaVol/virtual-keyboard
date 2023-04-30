@@ -1,18 +1,47 @@
-const init = () => {
-  const container = document.createElement("main");
-  container.classList.add("main");
-  document.body.appendChild(container);
+const container = document.createElement("main");
+container.classList.add("main");
+document.body.appendChild(container);
 
-  const title = document.createElement("h1");
-  title.classList.add("title");
-  title.innerText = "This is a virtual keyboard ";
-  container.appendChild(title)
+const title = document.createElement("h1");
+title.classList.add("title");
+title.innerText = "This is a virtual keyboard ";
+container.appendChild(title);
 
-  const textarea = document.createElement("textarea");
-  textarea.classList.add("textarea");
-  container.appendChild(textarea);
-};
-init();
+const textarea = document.createElement("textarea");
+textarea.classList.add("textarea");
+container.appendChild(textarea);
+textarea.addEventListener("click", (e) => {});
+
+const keyboard = document.createElement("section");
+keyboard.classList.add("keyboard");
+container.appendChild(keyboard);
+
+keyboard.addEventListener("click", (e) => {
+  [...keyboard.getElementsByClassName("keyboard__key")].forEach((key) => {
+    key.classList.remove("active");
+  });
+  e.target.classList.add("active");
+  textarea.value += e.target.innerText;
+});
+
+const bg = document.createElement("div");
+bg.classList.add("keyboard__bg");
+keyboard.appendChild(bg);
+
+const keyboardLines = [
+  "keyboard__first-line",
+  "keyboard__second-line",
+  "keyboard__third-line",
+  "keyboard__forth-line",
+  "keyboard__fifth-line",
+];
+
+keyboardLines.forEach((item) => {
+  let line = document.createElement("section");
+  line.classList.add(`keyboard__line`);
+  line.classList.add(item);
+  keyboard.appendChild(line);
+});
 
 const createKeys = () => {
   const keyLayoutEng = [
@@ -279,5 +308,58 @@ const createKeys = () => {
     "down arrow",
     "right arrow",
   ];
+  let currKeyLayout = keyLayoutEng;
+  currKeyLayout.forEach((key) => {
+    const keyElement = document.createElement("button");
+    const insertLineBreak =
+      ["backspace", "p", "enter", "?"].indexOf(key) !== -1;
 
+    // Add attributes/classes
+    keyElement.setAttribute("type", "button");
+    keyElement.classList.add("keyboard__key");
+
+    switch (key) {
+      case "backspace":
+        keyElement.textContent = key;
+        keyElement.addEventListener("click", () => {});
+
+        break;
+
+      case "caps":
+        keyElement.addEventListener("click", () => {});
+
+        break;
+
+      case "enter":
+        keyElement.textContent = key;
+        keyElement.addEventListener("click", () => {});
+
+        break;
+
+      case "space":
+        keyElement.addEventListener("click", () => {});
+
+        break;
+
+      default:
+        keyElement.textContent = key;
+        keyElement.addEventListener("click", () => {});
+
+        break;
+    }
+
+    if (currKeyLayout.indexOf(key) < 14) {
+      document.querySelector(".keyboard__first-line").appendChild(keyElement);
+    } else if (currKeyLayout.indexOf(key) < 28) {
+      document.querySelector(".keyboard__second-line").appendChild(keyElement);
+    } else if (currKeyLayout.indexOf(key) < 42) {
+      document.querySelector(".keyboard__third-line").appendChild(keyElement);
+    } else if (currKeyLayout.indexOf(key) < 55) {
+      document.querySelector(".keyboard__forth-line").appendChild(keyElement);
+    } else {
+      document.querySelector(".keyboard__fifth-line").appendChild(keyElement);
+    }
+  });
 };
+
+createKeys();
