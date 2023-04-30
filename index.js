@@ -16,16 +16,6 @@ const keyboard = document.createElement("section");
 keyboard.classList.add("keyboard");
 container.appendChild(keyboard);
 
-keyboard.addEventListener("click", (e) => {
-  [...keyboard.getElementsByClassName("keyboard__key")].forEach((key) => {
-    key.classList.remove("active");
-  });
-  e.target.classList.add("active");
-  if (e.target.innerText.length > 1) {
-    return;
-  } else textarea.value += e.target.innerText;
-});
-
 const bg = document.createElement("div");
 bg.classList.add("keyboard__bg");
 keyboard.appendChild(bg);
@@ -40,281 +30,307 @@ const keyboardLines = [
 
 keyboardLines.forEach((item) => {
   let line = document.createElement("section");
-  line.classList.add(`keyboard__line`);
+  line.classList.add("keyboard__line");
   line.classList.add(item);
   keyboard.appendChild(line);
 });
 
+const keyLayoutEng = [
+  "`",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "0",
+  "-",
+  "=",
+  "backspace",
+  "Tab",
+  "q",
+  "w",
+  "e",
+  "r",
+  "t",
+  "y",
+  "u",
+  "i",
+  "o",
+  "p",
+  "[",
+  "]",
+  "del",
+  "Caps Lock",
+  "a",
+  "s",
+  "d",
+  "f",
+  "g",
+  "h",
+  "j",
+  "k",
+  "l",
+  ";",
+  `'`,
+  `\\`,
+  "enter",
+  "shift",
+  "z",
+  "x",
+  "c",
+  "v",
+  "b",
+  "n",
+  "m",
+  ",",
+  ".",
+  "/",
+  "br",
+  "up arrow",
+  "shift",
+  "ctrl",
+  "Win",
+  "alt",
+  "space",
+  "alt",
+  "ctrl",
+  "left arrow",
+  "down arrow",
+  "right arrow",
+];
+const keyLayoutEngShift = [
+  "~",
+  "!",
+  "@",
+  "#",
+  "$",
+  "%",
+  "^",
+  "&",
+  "*",
+  "(",
+  ")",
+  "_",
+  "+",
+  "backspace",
+  "Tab",
+  "Q",
+  "W",
+  "E",
+  "R",
+  "T",
+  "Y",
+  "U",
+  "I",
+  "O",
+  "P",
+  "{",
+  "}",
+  "del",
+  "Caps Lock",
+  "A",
+  "S",
+  "D",
+  "F",
+  "G",
+  "H",
+  "J",
+  "K",
+  "L",
+  ":",
+  `"`,
+  "/",
+  "enter",
+  "shift",
+  "\\",
+  "Z",
+  "X",
+  "C",
+  "V",
+  "B",
+  "N",
+  "M",
+  "<",
+  ">",
+  "?",
+  "up arrow",
+  "shift",
+  "ctrl",
+  "Win",
+  "alt",
+  "space",
+  "alt",
+  "ctrl",
+  "left arrow",
+  "down arrow",
+  "right arrow",
+];
+const keyLayoutRu = [
+  "ё",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "0",
+  "-",
+  "=",
+  "backspace",
+  "Tab",
+  "й",
+  "ц",
+  "у",
+  "к",
+  "е",
+  "н",
+  "г",
+  "ш",
+  "щ",
+  "з",
+  "х",
+  "ъ",
+  "del",
+  "Caps Lock",
+  "ф",
+  "ы",
+  "в",
+  "а",
+  "п",
+  "р",
+  "о",
+  "л",
+  "д",
+  "ж",
+  `э`,
+  `\\`,
+  "enter",
+  "shift",
+  "\\",
+  "я",
+  "ч",
+  "с",
+  "м",
+  "и",
+  "т",
+  "ь",
+  "б",
+  "ю",
+  ".",
+  "up arrow",
+  "shift",
+  "ctrl",
+  "Win",
+  "alt",
+  "space",
+  "alt",
+  "ctrl",
+  "left arrow",
+  "down arrow",
+  "right arrow",
+];
+const keyLayoutRuShift = [
+  "Ё",
+  "!",
+  `"`,
+  "№",
+  ";",
+  "%",
+  ":",
+  "?",
+  "*",
+  "(",
+  ")",
+  "_",
+  "+",
+  "backspace",
+  "Tab",
+  "Й",
+  "Ц",
+  "У",
+  "К",
+  "Е",
+  "Н",
+  "Г",
+  "Ш",
+  "Щ",
+  "З",
+  "Х",
+  "Ъ",
+  "del",
+  "Caps Lock",
+  "Ф",
+  "Ы",
+  "В",
+  "А",
+  "П",
+  "Р",
+  "О",
+  "Л",
+  "Д",
+  "Ж",
+  `Э`,
+  `/`,
+  "enter",
+  "shift",
+  "\\",
+  "Я",
+  "Ч",
+  "С",
+  "М",
+  "И",
+  "Т",
+  "Ь",
+  "Б",
+  "Ю",
+  ",",
+  "up arrow",
+  "shift",
+  "ctrl",
+  "Win",
+  "alt",
+  "space",
+  "alt",
+  "ctrl",
+  "left arrow",
+  "down arrow",
+  "right arrow",
+];
+
+let currKeyLayout = keyLayoutEng;
+let isRus = false,
+  isShift = false,
+  isAlt = false,
+  isCaps = false;
+
+if (isAlt && isShift) {
+  isRus = !isRus;
+}
+const changeShift = () => {
+  isShift = !isShift;
+};
+const changeAlt = () => {
+  isAlt = !isAlt;
+};
+const changeCaps = () => {
+  isCaps = !isCaps;
+};
+if (isShift && isAlt) {
+  isRus = !isRus;
+}
+if (isRus) {
+  currKeyLayout = keyLayoutRu;
+  reloadKeys();
+} else currKeyLayout = keyLayoutEng;
+
 const createKeys = () => {
-  const keyLayoutEng = [
-    "`",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "0",
-    "-",
-    "=",
-    "backspace",
-    "Tab",
-    "q",
-    "w",
-    "e",
-    "r",
-    "t",
-    "y",
-    "u",
-    "i",
-    "o",
-    "p",
-    "[",
-    "]",
-    "del",
-    "Caps Lock",
-    "a",
-    "s",
-    "d",
-    "f",
-    "g",
-    "h",
-    "j",
-    "k",
-    "l",
-    ";",
-    `'`,
-    `\\`,
-    "enter",
-    "shift",
-    "z",
-    "x",
-    "c",
-    "v",
-    "b",
-    "n",
-    "m",
-    ",",
-    ".",
-    "/",
-    "br",
-    "up arrow",
-    "shift",
-    "ctrl",
-    "Win",
-    "alt",
-    "space",
-    "alt",
-    "ctrl",
-    "left arrow",
-    "down arrow",
-    "right arrow",
-  ];
-  const keyLayoutEngShift = [
-    "~",
-    "!",
-    "@",
-    "#",
-    "$",
-    "%",
-    "^",
-    "&",
-    "*",
-    "(",
-    ")",
-    "_",
-    "+",
-    "backspace",
-    "Tab",
-    "Q",
-    "W",
-    "E",
-    "R",
-    "T",
-    "Y",
-    "U",
-    "I",
-    "O",
-    "P",
-    "{",
-    "}",
-    "del",
-    "Caps Lock",
-    "A",
-    "S",
-    "D",
-    "F",
-    "G",
-    "H",
-    "J",
-    "K",
-    "L",
-    ":",
-    `"`,
-    "/",
-    "enter",
-    "shift",
-    "\\",
-    "Z",
-    "X",
-    "C",
-    "V",
-    "B",
-    "N",
-    "M",
-    "<",
-    ">",
-    "?",
-    "up arrow",
-    "shift",
-    "ctrl",
-    "Win",
-    "alt",
-    "space",
-    "alt",
-    "ctrl",
-    "left arrow",
-    "down arrow",
-    "right arrow",
-  ];
-  const keyLayoutRu = [
-    "ё",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "0",
-    "-",
-    "=",
-    "backspace",
-    "Tab",
-    "й",
-    "ц",
-    "у",
-    "к",
-    "е",
-    "н",
-    "г",
-    "ш",
-    "щ",
-    "з",
-    "х",
-    "ъ",
-    "del",
-    "Caps Lock",
-    "ф",
-    "ы",
-    "в",
-    "а",
-    "п",
-    "р",
-    "о",
-    "л",
-    "д",
-    "ж",
-    `э`,
-    `\\`,
-    "enter",
-    "shift",
-    "\\",
-    "я",
-    "ч",
-    "с",
-    "м",
-    "и",
-    "т",
-    "ь",
-    "б",
-    "ю",
-    ".",
-    "up arrow",
-    "shift",
-    "ctrl",
-    "Win",
-    "alt",
-    "space",
-    "alt",
-    "ctrl",
-    "left arrow",
-    "down arrow",
-    "right arrow",
-  ];
-  const keyLayoutRuShift = [
-    "Ё",
-    "!",
-    `"`,
-    "№",
-    ";",
-    "%",
-    ":",
-    "?",
-    "*",
-    "(",
-    ")",
-    "_",
-    "+",
-    "backspace",
-    "Tab",
-    "Й",
-    "Ц",
-    "У",
-    "К",
-    "Е",
-    "Н",
-    "Г",
-    "Ш",
-    "Щ",
-    "З",
-    "Х",
-    "Ъ",
-    "del",
-    "Caps Lock",
-    "Ф",
-    "Ы",
-    "В",
-    "А",
-    "П",
-    "Р",
-    "О",
-    "Л",
-    "Д",
-    "Ж",
-    `Э`,
-    `/`,
-    "enter",
-    "shift",
-    "\\",
-    "Я",
-    "Ч",
-    "С",
-    "М",
-    "И",
-    "Т",
-    "Ь",
-    "Б",
-    "Ю",
-    ",",
-    "up arrow",
-    "shift",
-    "ctrl",
-    "Win",
-    "alt",
-    "space",
-    "alt",
-    "ctrl",
-    "left arrow",
-    "down arrow",
-    "right arrow",
-  ];
-  let currKeyLayout = keyLayoutEng;
   currKeyLayout.forEach((key) => {
     if (key === "br") {
       document
@@ -345,6 +361,7 @@ const createKeys = () => {
           });
 
           break;
+
         case "del":
           keyElement.textContent = key;
           keyElement.addEventListener("click", () => {
@@ -358,8 +375,25 @@ const createKeys = () => {
           break;
 
         case "caps":
-          keyElement.addEventListener("click", () => {});
+          keyElement.addEventListener("click", changeCaps());
 
+          break;
+
+        case "shift":
+          keyElement.addEventListener("mousedown", () => {
+            changeShift();
+            keyElement.addEventListener("mouseup", changeShift());
+            keyElement.removeEventListener("mouseup", changeShift());
+          });
+
+          break;
+
+        case "alt":
+          keyElement.addEventListener("mousedown", () => {
+            changeAlt();
+            keyElement.addEventListener("mouseup", changeAlt());
+            keyElement.removeEventListener("mouseup", changeAlt());
+          });
           break;
 
         case "enter":
@@ -398,3 +432,45 @@ const createKeys = () => {
 };
 
 createKeys();
+
+function reloadKeys() {
+  [...document.querySelectorAll(".keyboard__line")].forEach((line) => {
+    line.innerHTML = "";
+  });
+  createKeys();
+}
+
+keyboard.addEventListener("click", (e) => {
+  [...keyboard.getElementsByClassName("keyboard__key")].forEach((key) => {
+    key.classList.remove("active");
+  });
+
+  e.target.classList.add("active");
+  setTimeout(() => {
+    e.target.classList.remove("active");
+  }, 500);
+
+  if (e.target.innerText.length > 1) {
+    return;
+  } else textarea.value += e.target.innerText;
+});
+
+let btns = [...keyboard.getElementsByClassName("keyboard__key")];
+
+document.addEventListener("keydown", (e) => {
+  const btn = [...btns].find((btn) => btn.textContent === e.key);
+  btn ? btn.classList.add("active") : "";
+  textarea.value += e.key;
+});
+
+document.addEventListener("keyup", (e) => {
+  const btn = [...btns].find((btn) => btn.textContent === e.key);
+  if (btn) {
+    setTimeout(() => {
+      btn.classList.remove("active");
+    }, 500);
+  }
+});
+document.addEventListener('keydown', (e) => {
+  console.log(e);
+})
