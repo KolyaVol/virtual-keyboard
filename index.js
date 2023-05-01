@@ -16,6 +16,12 @@ const keyboard = document.createElement("section");
 keyboard.classList.add("keyboard");
 container.appendChild(keyboard);
 
+const description = document.createElement("p");
+keyboard.classList.add("description");
+description.innerHTML =
+  "Клавиатура сделана на ОС Windows. Для изменения языка нажмите Alt+Shift";
+container.appendChild(description);
+
 const bg = document.createElement("div");
 bg.classList.add("keyboard__bg");
 keyboard.appendChild(bg);
@@ -213,7 +219,6 @@ const keyLayoutRu = [
   `\\`,
   "enter",
   "shift",
-  "\\",
   "я",
   "ч",
   "с",
@@ -224,6 +229,7 @@ const keyLayoutRu = [
   "б",
   "ю",
   ".",
+  "br",
   "up arrow",
   "shift",
   "ctrl",
@@ -327,6 +333,7 @@ if (isShift && isAlt) {
 }
 if (isRus) {
   currKeyLayout = keyLayoutRu;
+  console.log(isRus);
   reloadKeys();
 } else currKeyLayout = keyLayoutEng;
 
@@ -380,6 +387,7 @@ const createKeys = () => {
           break;
 
         case "shift":
+          keyElement.textContent = key;
           keyElement.addEventListener("mousedown", () => {
             changeShift();
             keyElement.addEventListener("mouseup", changeShift());
@@ -389,6 +397,7 @@ const createKeys = () => {
           break;
 
         case "alt":
+          keyElement.textContent = key;
           keyElement.addEventListener("mousedown", () => {
             changeAlt();
             keyElement.addEventListener("mouseup", changeAlt());
@@ -460,17 +469,105 @@ let btns = [...keyboard.getElementsByClassName("keyboard__key")];
 document.addEventListener("keydown", (e) => {
   const btn = [...btns].find((btn) => btn.textContent === e.key);
   btn ? btn.classList.add("active") : "";
-  textarea.value += e.key;
+
+  switch (e.key) {
+    case "Control":
+      break;
+    case "Backspace":
+      let text = textarea.value;
+
+      if (cursorPos === textarea.value.length || cursorPos === 0) {
+        textarea.value = text.slice(0, textarea.value.length - 1);
+      } else {
+        textarea.value =
+          text.slice(0, cursorPos - 1) + text.slice(cursorPos, textarea.length);
+      }
+      textarea.selectionStart = cursorPos;
+      textarea.selectionEnd = cursorPos;
+      textarea.focus();
+      break;
+    case "Del":
+      let cursorPosition = textarea.selectionStart;
+      textarea.value =
+        text.slice(0, cursorPosition) +
+        text.slice(cursorPosition + 1, textarea.length);
+      break;
+    case "Shift":
+      isShift = true;
+
+      if (isShift && isRus) {
+        currKeyLayout = keyLayoutRuShift;
+        reloadKeys();
+      } else if (isShift && !isRus) {
+        currKeyLayout = keyLayoutEngShift;
+        reloadKeys();
+      }
+
+      if (isShift && isAlt) {
+        isRus = !isRus;
+      }
+
+      if (isRus) {
+        currKeyLayout = keyLayoutRu;
+        reloadKeys();
+      } else {
+        currKeyLayout = keyLayoutEng;
+        reloadKeys();
+      }
+
+      break;
+    case "CapsLock":
+      break;
+    case "Alt":
+      isAlt = true;
+      if (isShift && isAlt) {
+        isRus = !isRus;
+      }
+      if (isRus) {
+        currKeyLayout = keyLayoutRu;
+        reloadKeys();
+      } else currKeyLayout = keyLayoutEng;
+      break;
+
+    default:
+      textarea.value += e.key;
+      break;
+  }
 });
 
 document.addEventListener("keyup", (e) => {
-  const btn = [...btns].find((btn) => btn.textContent === e.key);
+  const btn = [...btns].find(
+    (btn) => btn.textContent.toLowerCase() === e.key.toLowerCase()
+  );
   if (btn) {
+    switch (e.key) {
+      case "Control":
+        break;
+      case "Shift":
+        isShift = false;
+        if (isShift && isRus) {
+          currKeyLayout = keyLayoutRuShift;
+          reloadKeys();
+        }
+        if (isShift && !isRus) {
+          currKeyLayout = keyLayoutEngShift;
+          reloadKeys();
+        }
+        break;
+      case "CapsLock":
+        break;
+      case "Alt":
+        isAlt = false;
+        break;
+
+      default:
+        break;
+    }
     setTimeout(() => {
       btn.classList.remove("active");
     }, 500);
   }
 });
-document.addEventListener('keydown', (e) => {
+document.addEventListener("keydown", (e) => {
   console.log(e);
-})
+});
