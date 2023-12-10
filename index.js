@@ -485,8 +485,6 @@ function caps() {
     if (item.textContent.toUpperCase() === "caps lock") {
       item.classList.add("active");
     }
-  });
-  btns.forEach((item) => {
     if (isCaps && item.innerText.length < 2) {
       item.innerText = item.innerText.toUpperCase();
     } else {
@@ -498,9 +496,48 @@ function alt() {
   isAlt = true;
 }
 
+function leftArrow() {
+  textarea.value += "←";
+  btns.forEach((item) => {
+    if (item.textContent.toLowerCase() === "←") {
+      item.classList.add("active");
+      removeActiveClass(item);
+    }
+  });
+}
+
+function rightArrow() {
+  textarea.value += "→";
+  btns.forEach((item) => {
+    if (item.textContent.toLowerCase() === "→") {
+      item.classList.add("active");
+      removeActiveClass(item);
+    }
+  });
+}
+
+function upArrow() {
+  textarea.value += "↑";
+  btns.forEach((item) => {
+    if (item.textContent.toLowerCase() === "↑") {
+      item.classList.add("active");
+      removeActiveClass(item);
+    }
+  });
+}
+
+function downArrow() {
+  textarea.value += "↓";
+  btns.forEach((item) => {
+    if (item.textContent.toLowerCase() === "↓") {
+      item.classList.add("active");
+      removeActiveClass(item);
+    }
+  });
+}
+
 keyboard.addEventListener("mousedown", (e) => {
   e.target.classList.add("active");
-
   switch (e.target.innerText.toLowerCase()) {
     case "ctrl":
       ctrl();
@@ -539,17 +576,21 @@ keyboard.addEventListener("mousedown", (e) => {
       break;
 
     default:
-      keyboard.addEventListener("mouseup", (e) => {
-        removeActiveClass(e.target);
-      });
+      if (e.target.innerText.length > 1) {
+        return;
+      } else {
+        addText(e.target.innerText);
+      }
+
       break;
   }
+});
 
-  if (e.target.innerText.length > 1) {
-    return;
-  } else {
-    addText(e.target.innerText);
-  }
+keyboard.addEventListener("mouseup", (e) => {
+  removeActiveClass(e.target);
+});
+keyboard.addEventListener("mouseout", (e) => {
+  removeActiveClass(e.target);
 });
 
 document.addEventListener("keydown", (e) => {
@@ -586,89 +627,33 @@ document.addEventListener("keydown", (e) => {
       break;
 
     case "Shift":
-      isShift = true;
-      if (isRus) {
-        currKeyLayout = keyLayoutRu;
-        localStorage.removeItem("ru");
-        reloadKeys();
-      } else {
-        currKeyLayout = keyLayoutEng;
-        localStorage.setItem("ru", "ru");
-
-        reloadKeys();
-      }
-      if (isShift && isRus) {
-        currKeyLayout = keyLayoutRuShift;
-        reloadKeys();
-      } else if (isShift && !isRus) {
-        currKeyLayout = keyLayoutEngShift;
-        reloadKeys();
-      }
-
-      if (isShift && isAlt) {
-        isRus = !isRus;
-      }
+      shift();
       break;
 
     case "CapsLock":
-      isCaps = !isCaps;
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "caps lock") {
-          item.classList.add("active");
-        }
-      });
-      btns.forEach((item) => {
-        if (isCaps) {
-          item.innerText = item.innerText.toUpperCase();
-        } else {
-          item.innerText = item.innerText.toLowerCase();
-        }
-      });
+      caps();
       break;
 
     case "Alt":
-      isAlt = true;
+      alt();
       break;
 
     case "ArrowLeft":
-      textarea.value += "←";
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "←") {
-          item.classList.add("active");
-          removeActiveClass(item);
-        }
-      });
+      leftArrow();
       break;
 
     case "ArrowRight":
-      textarea.value += "→";
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "→") {
-          item.classList.add("active");
-          removeActiveClass(item);
-        }
-      });
+      rightArrow();
       break;
 
     case "ArrowUp":
-      textarea.value += "↑";
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "↑") {
-          item.classList.add("active");
-          removeActiveClass(item);
-        }
-      });
+      upArrow();
       break;
 
     case "ArrowDown":
-      textarea.value += "↓";
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "↓") {
-          item.classList.add("active");
-          removeActiveClass(item);
-        }
-      });
+      downArrow();
       break;
+
     default:
       addText(e.key);
       break;
