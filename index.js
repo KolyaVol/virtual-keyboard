@@ -309,12 +309,15 @@ const keyLayoutRuShift = [
   "↓",
   "→",
 ];
-
-let currKeyLayout = keyLayoutEng;
 let isRus = false,
   isShift = false,
   isAlt = false,
-  isCaps = false;
+  isCaps = false,
+  currKeyLayout = keyLayoutEng;
+
+if (navigator.language == "en-US") {
+  currKeyLayout = keyLayoutEng;
+} else currKeyLayout = keyLayoutRu;
 
 if (isAlt && isShift) {
   isRus = !isRus;
@@ -388,126 +391,160 @@ function reloadKeys() {
   });
 }
 
+function del(text) {
+  text = textarea.value;
+  selectionStart = textarea.selectionStart;
+  if (selectionStart === textarea.value.length || selectionStart === 0) {
+    textarea.value = text.slice(0, textarea.value.length - 1);
+  } else {
+    textarea.value =
+      text.slice(0, selectionStart) +
+      text.slice(selectionStart + 1, textarea.value.length);
+  }
+  textarea.selectionStart = selectionStart;
+}
+
+function backspace(text) {
+  text = textarea.value;
+  selectionStart = textarea.selectionStart;
+  if (selectionStart === textarea.value.length || selectionStart === 0) {
+    textarea.value = text.slice(0, textarea.value.length - 1);
+  } else {
+    textarea.value =
+      text.slice(0, selectionStart - 1) +
+      text.slice(selectionStart, textarea.value.length);
+  }
+  textarea.selectionStart = selectionStart - 1;
+  textarea.selectionEnd = selectionStart - 1;
+  textarea.focus();
+}
+
+function ctrl() {
+  btns.forEach((item) => {
+    if (item.textContent === "ctrl") {
+      item.classList.add("active");
+    }
+  });
+}
+
+function tab() {
+  textarea.value += "    ";
+  btns.forEach((item) => {
+    if (item.textContent.toLowerCase() === "tab") {
+      item.classList.add("active");
+    }
+  });
+}
+
+function space() {
+  btns.forEach((item) => {
+    if (item.textContent.toLowerCase() === "space") {
+      textarea.value += " ";
+      item.classList.add("active");
+      removeActiveClass(item);
+    }
+  });
+}
+
+function enter(e) {
+  e.preventDefault();
+  textarea.value += "\n";
+  btns.forEach((item) => {
+    if (item.textContent.toLowerCase() === "enter") {
+      item.classList.add("active");
+    }
+  });
+}
+
+function shift() {
+  isShift = true;
+  if (isRus) {
+    currKeyLayout = keyLayoutRu;
+    localStorage.setItem("ru", "ru");
+    reloadKeys();
+  } else {
+    currKeyLayout = keyLayoutEng;
+    localStorage.removeItem("ru");
+    reloadKeys();
+  }
+  if (isShift && isRus) {
+    currKeyLayout = keyLayoutRuShift;
+    reloadKeys();
+  } else if (isShift && !isRus) {
+    currKeyLayout = keyLayoutEngShift;
+    reloadKeys();
+  }
+  if (isShift && isAlt) {
+    isRus = !isRus;
+  }
+}
+function caps() {
+  isCaps = !isCaps;
+
+  btns.forEach((item) => {
+    if (item.textContent.toUpperCase() === "caps lock") {
+      item.classList.add("active");
+    }
+  });
+  btns.forEach((item) => {
+    if (isCaps && item.innerText.length < 2) {
+      item.innerText = item.innerText.toUpperCase();
+    } else {
+      item.innerText = item.innerText.toLowerCase();
+    }
+  });
+}
+function alt() {
+  isAlt = true;
+}
+
 keyboard.addEventListener("mousedown", (e) => {
-  let text = textarea.value;
   e.target.classList.add("active");
- 
 
   switch (e.target.innerText.toLowerCase()) {
     case "ctrl":
-      btns.forEach((item) => {
-        if (item.textContent === "ctrl") {
-          item.classList.add("active");
-        }
-      });
+      ctrl();
       break;
 
     case "tab":
-      textarea.value += "    ";
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "tab") {
-          item.classList.add("active");
-        }
-      });
+      tab();
       break;
 
     case "space":
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "space") {
-          textarea.value += " ";
-          item.classList.add("active");
-        }
-      });
+      space();
       break;
 
     case "enter":
-      e.preventDefault();
-      textarea.value += "\n";
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "enter") {
-          item.classList.add("active");
-        }
-      });
+      enter(e);
       break;
 
     case "backspace":
-      text = textarea.value;
-      selectionStart = textarea.selectionStart;
-      if (selectionStart === textarea.value.length || selectionStart === 0) {
-        textarea.value = text.slice(0, textarea.value.length - 1);
-      } else {
-        textarea.value =
-          text.slice(0, selectionStart - 1) +
-          text.slice(selectionStart, textarea.value.length);
-      }
-      textarea.selectionStart = selectionStart - 1;
-      textarea.selectionEnd = selectionStart - 1;
-      textarea.focus();
+      backspace();
       break;
 
     case "del":
-      text = textarea.value;
-      selectionStart = textarea.selectionStart;
-      if (selectionStart === textarea.value.length || selectionStart === 0) {
-        textarea.value = text.slice(0, textarea.value.length - 1);
-      } else {
-        textarea.value =
-          text.slice(0, selectionStart) +
-          text.slice(selectionStart, textarea.value.length);
-      }
+      del();
       break;
 
     case "shift":
-      isShift = true;
-      if (isRus) {
-        currKeyLayout = keyLayoutRu;
-        localStorage.setItem("ru", "ru");
-        reloadKeys();
-      } else {
-        currKeyLayout = keyLayoutEng;
-        localStorage.removeItem("ru");
-        reloadKeys();
-      }
-      if (isShift && isRus) {
-        currKeyLayout = keyLayoutRuShift;
-        reloadKeys();
-      } else if (isShift && !isRus) {
-        currKeyLayout = keyLayoutEngShift;
-        reloadKeys();
-      }
-      if (isShift && isAlt) {
-        isRus = !isRus;
-      }
+      shift();
       break;
 
     case "caps lock":
-      isCaps = !isCaps;
-
-      btns.forEach((item) => {
-        if (item.textContent.toUpperCase() === "caps lock") {
-          item.classList.add("active");
-        }
-      });
-      btns.forEach((item) => {
-        if (isCaps && item.innerText.length < 2) {
-          item.innerText = item.innerText.toUpperCase();
-        } else {
-          item.innerText = item.innerText.toLowerCase();
-        }
-      });
+      caps();
       break;
 
     case "alt":
-      isAlt = true;
+      alt();
       break;
 
     default:
+      keyboard.addEventListener("mouseup", (e) => {
+        removeActiveClass(e.target);
+      });
       break;
   }
 
-  keyboard.addEventListener("mouseup", (e) => {
-    removeActiveClass(e.target);
-  });
   if (e.target.innerText.length > 1) {
     return;
   } else {
@@ -517,8 +554,7 @@ keyboard.addEventListener("mousedown", (e) => {
 
 document.addEventListener("keydown", (e) => {
   e.preventDefault();
-  let text = textarea.value;
- 
+
   const btn = btns.find(
     (btn) => btn.textContent.toLowerCase() === e.key.toLowerCase()
   );
@@ -526,66 +562,29 @@ document.addEventListener("keydown", (e) => {
 
   switch (e.key) {
     case "Control":
-      btns.forEach((item) => {
-        if (item.textContent === "ctrl") {
-          item.classList.add("active");
-        }
-      });
-
+      ctrl();
       break;
+
     case "Tab":
-      textarea.value += "    ";
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "tab") {
-          item.classList.add("active");
-        }
-      });
+      tab();
       break;
+
     case " ":
-      textarea.value += " ";
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "space") {
-          item.classList.add("active");
-          removeActiveClass(item);
-        }
-      });
+      space(e);
       break;
+
     case "Enter":
-      e.preventDefault();
-      textarea.value += "\n";
-      btns.forEach((item) => {
-        if (item.textContent.toLowerCase() === "enter") {
-          item.classList.add("active");
-        }
-      });
-
+      enter(e);
       break;
+
     case "Backspace":
-      text = textarea.value;
-      selectionStart = textarea.selectionStart;
-      if (selectionStart === textarea.value.length || selectionStart === 0) {
-        textarea.value = text.slice(0, textarea.value.length - 1);
-      } else {
-        textarea.value =
-          text.slice(0, selectionStart - 1) +
-          text.slice(selectionStart, textarea.value.length);
-      }
-      textarea.selectionStart = selectionStart - 1;
-      textarea.selectionEnd = selectionStart - 1;
-      textarea.focus();
+      backspace();
+      break;
 
-      break;
     case "Delete":
-      text = textarea.value;
-      selectionStart = textarea.selectionStart;
-      if (selectionStart === textarea.value.length || selectionStart === 0) {
-        textarea.value = text.slice(0, textarea.value.length - 1);
-      } else {
-        textarea.value =
-          text.slice(0, selectionStart) +
-          text.slice(selectionStart, textarea.value.length);
-      }
+      del();
       break;
+
     case "Shift":
       isShift = true;
       if (isRus) {
@@ -609,8 +608,8 @@ document.addEventListener("keydown", (e) => {
       if (isShift && isAlt) {
         isRus = !isRus;
       }
-
       break;
+
     case "CapsLock":
       isCaps = !isCaps;
       btns.forEach((item) => {
@@ -630,6 +629,7 @@ document.addEventListener("keydown", (e) => {
     case "Alt":
       isAlt = true;
       break;
+
     case "ArrowLeft":
       textarea.value += "←";
       btns.forEach((item) => {
@@ -639,6 +639,7 @@ document.addEventListener("keydown", (e) => {
         }
       });
       break;
+
     case "ArrowRight":
       textarea.value += "→";
       btns.forEach((item) => {
@@ -648,6 +649,7 @@ document.addEventListener("keydown", (e) => {
         }
       });
       break;
+
     case "ArrowUp":
       textarea.value += "↑";
       btns.forEach((item) => {
@@ -657,6 +659,7 @@ document.addEventListener("keydown", (e) => {
         }
       });
       break;
+
     case "ArrowDown":
       textarea.value += "↓";
       btns.forEach((item) => {
@@ -670,10 +673,10 @@ document.addEventListener("keydown", (e) => {
       addText(e.key);
       break;
   }
+  removeActiveClass(e.target);
 });
 
 document.addEventListener("keyup", (e) => {
-  
   const btn = btns.find(
     (btn) => btn.textContent.toLowerCase() === e.key.toLowerCase()
   );
@@ -684,8 +687,8 @@ document.addEventListener("keyup", (e) => {
           removeActiveClass(item);
         }
       });
-
       break;
+
     case "Shift":
       isShift = false;
       btns.forEach((item) => {
@@ -693,7 +696,6 @@ document.addEventListener("keyup", (e) => {
           removeActiveClass(item);
         }
       });
-
       if (isRus) {
         currKeyLayout = keyLayoutRu;
         reloadKeys();
@@ -708,12 +710,16 @@ document.addEventListener("keyup", (e) => {
         currKeyLayout = keyLayoutEngShift;
         reloadKeys();
       }
-
       if (isShift && isAlt) {
         isRus = !isRus;
       }
-
       break;
+
+    case "space":
+      removeActiveClass(btn);
+      removeActiveClass(e.target);
+      break;
+
     case "CapsLock":
       btns.forEach((item) => {
         if (item.textContent.toLowerCase() === "caps lock") {
