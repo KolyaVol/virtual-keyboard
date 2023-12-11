@@ -55,7 +55,7 @@ const keyLayoutEng = [
   "0",
   "-",
   "=",
-  "backspace",
+  "Backspace",
   "Tab",
   "q",
   "w",
@@ -69,7 +69,7 @@ const keyLayoutEng = [
   "p",
   "[",
   "]",
-  "del",
+  "Del",
   "Caps Lock",
   "a",
   "s",
@@ -83,8 +83,8 @@ const keyLayoutEng = [
   ";",
   `'`,
   `\\`,
-  "enter",
-  "shift",
+  "Enter",
+  "Shift",
   "z",
   "x",
   "c",
@@ -97,13 +97,13 @@ const keyLayoutEng = [
   "/",
   "void",
   "↑",
-  "shift",
-  "ctrl",
+  "Shift",
+  "Ctrl",
   "Win",
-  "alt",
-  "space",
-  "alt",
-  "ctrl",
+  "Alt",
+  "Space",
+  "Alt",
+  "Ctrl",
   "←",
   "↓",
   "→",
@@ -122,7 +122,7 @@ const keyLayoutEngShift = [
   ")",
   "_",
   "+",
-  "backspace",
+  "Backspace",
   "Tab",
   "Q",
   "W",
@@ -136,7 +136,7 @@ const keyLayoutEngShift = [
   "P",
   "{",
   "}",
-  "del",
+  "Del",
   "Caps Lock",
   "A",
   "S",
@@ -150,8 +150,8 @@ const keyLayoutEngShift = [
   ":",
   `"`,
   "/",
-  "enter",
-  "shift",
+  "Enter",
+  "Shift",
   "Z",
   "X",
   "C",
@@ -164,13 +164,13 @@ const keyLayoutEngShift = [
   "?",
   "void",
   "↑",
-  "shift",
-  "ctrl",
+  "Shift",
+  "Ctrl",
   "Win",
-  "alt",
-  "space",
-  "alt",
-  "ctrl",
+  "Alt",
+  "Space",
+  "Alt",
+  "Ctrl",
   "←",
   "↓",
   "→",
@@ -189,7 +189,7 @@ const keyLayoutRu = [
   "0",
   "-",
   "=",
-  "backspace",
+  "Backspace",
   "Tab",
   "й",
   "ц",
@@ -203,7 +203,7 @@ const keyLayoutRu = [
   "з",
   "х",
   "ъ",
-  "del",
+  "Del",
   "Caps Lock",
   "ф",
   "ы",
@@ -217,8 +217,8 @@ const keyLayoutRu = [
   "ж",
   `э`,
   `\\`,
-  "enter",
-  "shift",
+  "Enter",
+  "Shift",
   "я",
   "ч",
   "с",
@@ -231,13 +231,13 @@ const keyLayoutRu = [
   ".",
   "void",
   "↑",
-  "shift",
-  "ctrl",
+  "Shift",
+  "Ctrl",
   "Win",
-  "alt",
-  "space",
-  "alt",
-  "ctrl",
+  "Alt",
+  "Space",
+  "Alt",
+  "Ctrl",
   "←",
   "↓",
   "→",
@@ -256,7 +256,7 @@ const keyLayoutRuShift = [
   ")",
   "_",
   "+",
-  "backspace",
+  "Backspace",
   "Tab",
   "Й",
   "Ц",
@@ -270,7 +270,7 @@ const keyLayoutRuShift = [
   "З",
   "Х",
   "Ъ",
-  "del",
+  "Del",
   "Caps Lock",
   "Ф",
   "Ы",
@@ -284,8 +284,8 @@ const keyLayoutRuShift = [
   "Ж",
   `Э`,
   `/`,
-  "enter",
-  "shift",
+  "Enter",
+  "Shift",
   "Я",
   "Ч",
   "С",
@@ -298,13 +298,13 @@ const keyLayoutRuShift = [
   ",",
   "void",
   "↑",
-  "shift",
-  "ctrl",
+  "Shift",
+  "Ctrl",
   "Win",
-  "alt",
-  "space",
-  "alt",
-  "ctrl",
+  "Alt",
+  "Space",
+  "Alt",
+  "Ctrl",
   "←",
   "↓",
   "→",
@@ -315,21 +315,13 @@ let isRus = false,
   isCaps = false,
   currKeyLayout = keyLayoutEng;
 
-if (navigator.language == "en-US") {
-  currKeyLayout = keyLayoutEng;
-} else currKeyLayout = keyLayoutRu;
-
-if (isAlt && isShift) {
-  isRus = !isRus;
-}
-
-if (isShift && isAlt) {
-  isRus = !isRus;
-}
-if (isRus) {
-  currKeyLayout = keyLayoutRu;
-  reloadKeys();
-} else currKeyLayout = keyLayoutEng;
+document.addEventListener("DOMContentLoaded", () => {
+  if (localStorage.getItem("ru")) {
+    isRus = true;
+    currKeyLayout = keyLayoutRu;
+    reloadKeys();
+  }
+});
 
 function removeActiveClass(item) {
   setTimeout(() => {
@@ -391,11 +383,22 @@ function reloadKeys() {
   });
 }
 
-function del(text) {
-  text = textarea.value;
+function del() {
+  let text = textarea.value;
   selectionStart = textarea.selectionStart;
+  let selectionEnd = textarea.selectionEnd;
+  if (selectionStart != selectionEnd) {
+    textarea.value =
+      text.substring(0, selectionStart) +
+      text.substring(selectionEnd, text.length);
+    textarea.selectionStart = selectionStart;
+    textarea.selectionEnd = selectionStart;
+
+    return;
+  }
+
   if (selectionStart === textarea.value.length || selectionStart === 0) {
-    textarea.value = text.slice(0, textarea.value.length - 1);
+    return;
   } else {
     textarea.value =
       text.slice(0, selectionStart) +
@@ -407,16 +410,21 @@ function del(text) {
 function backspace(text) {
   text = textarea.value;
   selectionStart = textarea.selectionStart;
-  if (selectionStart === textarea.value.length || selectionStart === 0) {
-    textarea.value = text.slice(0, textarea.value.length - 1);
-  } else {
+  let selectionEnd = textarea.selectionEnd;
+  if (selectionStart != selectionEnd) {
     textarea.value =
-      text.slice(0, selectionStart - 1) +
-      text.slice(selectionStart, textarea.value.length);
+      text.substring(0, selectionStart) +
+      text.substring(selectionEnd, text.length);
+    textarea.selectionStart = selectionStart;
+    textarea.selectionEnd = selectionStart;
+
+    return;
   }
+
+  textarea.value =
+    text.slice(0, selectionStart - 1) +
+    text.slice(selectionStart, textarea.value.length);
   textarea.selectionStart = selectionStart - 1;
-  textarea.selectionEnd = selectionStart - 1;
-  textarea.focus();
 }
 
 function ctrl() {
@@ -465,9 +473,9 @@ function shift() {
   } else {
     currKeyLayout = keyLayoutRu;
     localStorage.setItem("ru", "ru");
-
     reloadKeys();
   }
+
   if (isShift && isRus) {
     currKeyLayout = keyLayoutRuShift;
     reloadKeys();
@@ -475,6 +483,7 @@ function shift() {
     currKeyLayout = keyLayoutEngShift;
     reloadKeys();
   }
+
   if (isShift && isAlt) {
     isRus = !isRus;
   }
@@ -594,7 +603,8 @@ keyboard.addEventListener("mouseout", (e) => {
 
 document.addEventListener("keydown", (e) => {
   e.preventDefault();
-
+  textarea.blur();
+  textarea.focus();
   const btn = btns.find(
     (btn) => btn.textContent.toLowerCase() === e.key.toLowerCase()
   );
@@ -726,12 +736,4 @@ document.addEventListener("keyup", (e) => {
       break;
   }
   removeActiveClass(btn);
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (localStorage.getItem("ru")) {
-    isRus = true;
-    currKeyLayout = keyLayoutRu;
-  }
-  reloadKeys();
 });
