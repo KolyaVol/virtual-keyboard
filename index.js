@@ -459,12 +459,13 @@ function enter(e) {
 function shift() {
   isShift = true;
   if (isRus) {
-    currKeyLayout = keyLayoutRu;
-    localStorage.setItem("ru", "ru");
-    reloadKeys();
-  } else {
     currKeyLayout = keyLayoutEng;
     localStorage.removeItem("ru");
+    reloadKeys();
+  } else {
+    currKeyLayout = keyLayoutRu;
+    localStorage.setItem("ru", "ru");
+
     reloadKeys();
   }
   if (isShift && isRus) {
@@ -487,8 +488,6 @@ function caps() {
     }
     if (isCaps && item.innerText.length < 2) {
       item.innerText = item.innerText.toUpperCase();
-    } else {
-      item.innerText = item.innerText.toLowerCase();
     }
   });
 }
