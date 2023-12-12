@@ -405,6 +405,7 @@ function del() {
       text.slice(selectionStart + 1, textarea.value.length);
   }
   textarea.selectionStart = selectionStart;
+  textarea.selectionEnd = selectionStart;
 }
 
 function backspace(text) {
@@ -425,6 +426,7 @@ function backspace(text) {
     text.slice(0, selectionStart - 1) +
     text.slice(selectionStart, textarea.value.length);
   textarea.selectionStart = selectionStart - 1;
+  textarea.selectionEnd = selectionStart - 1;
 }
 
 function ctrl() {
